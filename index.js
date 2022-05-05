@@ -4,20 +4,69 @@ const mongoose = require('mongoose');
 const Recipe = require('./models/Recipe.model');
 // Import of the data from './data.json'
 const data = require('./data');
+const { findOneAndUpdate } = require('./models/Recipe.model');
 
 const MONGODB_URI = 'mongodb://localhost:27017/recipe-app';
 
 // Connection to the database "recipe-app"
 mongoose
   .connect(MONGODB_URI)
-  .then(x => {
-    console.log(`Connected to the database: "${x.connection.name}"`);
+  .then(response => {
+    console.log(`Connected to the database: "${response.connection.name}"`);
     // Before adding any recipes to the database, let's remove all existing ones
     return Recipe.deleteMany()
   })
-  .then(() => {
-    // Run your code here, after you have insured that the connection was made
+  // .then((response) => {
+  //   // Run your code here, after you have insured that the connection was made
+  //   return Recipe.create({
+  //     title: "Asian Glazed Chicken Thighs",
+  //     level: "Amateur Chef",
+  //     ingredients: [
+  //     "1/2 cup rice vinegar",
+  //     "5 tablespoons honey",
+  //     "1/3 cup soy sauce (such as Silver Swan®)",
+  //     "1/4 cup Asian (toasted) sesame oil",
+  //     "3 tablespoons Asian chili garlic sauce",
+  //     "3 tablespoons minced garlic",
+  //     "salt to taste",
+  //     "8 skinless, boneless chicken thighs"
+  //   ],
+  //   cuisine: "Asian",
+  //   dishType: "main_course",
+  //   image: "https://images.media-allrecipes.com/userphotos/720x405/815964.jpg",
+  //   duration: 40,
+  //   creator: "Chef LePapu"
+  //   })
+  // })
+  // .then((response) => {
+  //   console.log( response.title )
+  // })
+  .then((response)=> {
+
+    return Recipe.insertMany( data )
+
   })
-  .catch(error => {
+  .then((response) => {
+
+    data.forEach((eachTitle) => {
+
+      console.log(eachTitle.title)
+
+    })
+
+    // console.log(response)
+  })
+  .then((response)=> {
+
+    return Recipe.findOneAndUpdate({ title: "Rigatoni alla Genovese" }, { duration: 100 })
+
+  })
+.then((response)=> {
+  return Recipe.findOneAndDelete( { title: 'Carrot Cake' } )
+})
+.then((response) => {
+  mongoose.connection.close();
+})
+.catch(error => {
     console.error('Error connecting to the database', error);
-  });
+});
